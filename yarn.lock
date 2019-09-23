@@ -2161,6 +2161,11 @@ expo-gl@~7.0.0:
     expo-gl-cpp "~7.0.0"
     prop-types "^15.6.2"
 
+expo-image-manipulator@~7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/expo-image-manipulator/-/expo-image-manipulator-7.0.0.tgz#2306213b30e306e87ddb02f15e35c4f1f4d36a12"
+  integrity sha512-N6DV6QQ4fwppRgntXTk2zydyuSBkpkJCbU/VWohhhP26Pp2Z6ay0OfXz08OdQN2UEStAisx+W1St7cWqwq7tjA==
+
 expo-image-picker@~7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-7.0.0.tgz#e4a5a52bd6f9655f75ecf3cc866aa9bb0c99e24b"

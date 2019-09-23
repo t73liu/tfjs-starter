@@ -2,11 +2,7 @@ import * as tf from "@tensorflow/tfjs";
 import { decode as jpegDecode } from "jpeg-js";
 import { decode as pngDecode } from "upng-js";
 
-export function imageToTensor(rawImageData, { type } = {}) {
-  const { width, height, data } =
-    type === "png"
-      ? pngDecode(rawImageData)
-      : jpegDecode(rawImageData, { useTArray: true });
+export function removeAlphaChannel(width, height, data) {
   const buffer = new Uint8Array(width * height * 3);
   let offset = 0; // offset into original data
   for (let i = 0; i < buffer.length; i += 3) {
@@ -16,4 +12,18 @@ export function imageToTensor(rawImageData, { type } = {}) {
     offset += 4;
   }
   return tf.tensor3d(buffer, [height, width, 3]);
+}
+
+export function imageToTensor(rawImageData, { type } = {}) {
+  const { width, height, data } =
+    type === "png"
+      ? pngDecode(rawImageData)
+      : jpegDecode(rawImageData, { useTArray: true });
+  return removeAlphaChannel(width, height, data);
+}
+
+export function base64ImageToTensor(base64) {
+  const rawImageData = tf.util.encodeString(base64, "base64");
+  const { width, height, data } = jpegDecode(rawImageData, { useTArray: true });
+  return removeAlphaChannel(width, height, data);
 }

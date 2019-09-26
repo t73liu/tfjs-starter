@@ -1,6 +1,10 @@
-# TensorFlow.js React Native Starter
+# [TensorFlow.js React Native Starter](https://expo.io/@t73liu/tfjs-starter)
 
-TODO ...
+This is a simple application built using Expo and TensorFlow.js.
+It uses MobileNet to predict the object in the selected picture.
+
+This project is based on the example code provided by
+[tfjs-react-native](https://github.com/tensorflow/tfjs/tree/master/tfjs-react-native).
 
 ## Setup
 
@@ -17,4 +21,4 @@ Additional documentation can be found at https://docs.expo.io/versions/latest/.
 
 ## Screenshots
 
-TODO ...
+![Screenshot_20190925-222037](https://user-images.githubusercontent.com/5432907/65660286-21412b00-dfe3-11e9-980d-d8b0955358f7.png)

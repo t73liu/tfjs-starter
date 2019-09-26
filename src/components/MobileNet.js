@@ -3,9 +3,19 @@ import { Image, View } from "react-native";
 import * as tf from "@tensorflow/tfjs";
 import { fetch as tfFetch } from "@tensorflow/tfjs-react-native";
 import * as mobilenet from "@tensorflow-models/mobilenet";
-import { DataTable } from "react-native-paper";
-import { base64ImageToTensor, imageToTensor } from "../utils/image-utils";
+import { ActivityIndicator, DataTable } from "react-native-paper";
+import {
+  base64ImageToTensor,
+  imageToTensor,
+  resizeImage,
+} from "../utils/image-utils";
 import { formatPercentage } from "../utils/number-utils";
+
+const LoadingRow = () => (
+  <DataTable.Row key="loading">
+    <ActivityIndicator animating />
+  </DataTable.Row>
+);
 
 const EmptyRow = () => (
   <DataTable.Row key="empty">
@@ -16,6 +26,7 @@ const EmptyRow = () => (
 
 export default class MobileNet extends Component {
   state = {
+    isLoading: true,
     predictions: [],
   };
 
@@ -24,13 +35,14 @@ export default class MobileNet extends Component {
     this.model = await mobilenet.load();
     await this.model.classify(tf.zeros([1, 224, 224, 3]));
     const predictions = await this.updatePredictions();
-    this.setState({ predictions });
+    this.setState({ predictions, isLoading: false });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.source !== prevProps.source) {
+      this.setState({ isLoading: true });
       this.updatePredictions().then(predictions => {
-        this.setState({ predictions });
+        this.setState({ predictions, isLoading: false });
       });
     }
   }
@@ -49,7 +61,8 @@ export default class MobileNet extends Component {
         const rawImageData = await response.arrayBuffer();
         imageTensor = imageToTensor(rawImageData);
       } else {
-        imageTensor = base64ImageToTensor(source);
+        const { base64 } = await resizeImage(source.uri);
+        imageTensor = base64ImageToTensor(base64);
       }
       const predictions = await this.model.classify(imageTensor);
       tf.dispose([imageTensor]);
@@ -57,9 +70,20 @@ export default class MobileNet extends Component {
     }
   };
 
-  render() {
-    const { predictions } = this.state;
+  renderTableRows = () => {
+    const { predictions, isLoading } = this.state;
     const isEmpty = predictions.length === 0;
+    if (isLoading) return <LoadingRow />;
+    if (isEmpty) return <EmptyRow />;
+    return predictions.map(({ className, probability }) => (
+      <DataTable.Row key={className}>
+        <DataTable.Cell>{className}</DataTable.Cell>
+        <DataTable.Cell numeric>{formatPercentage(probability)}</DataTable.Cell>
+      </DataTable.Row>
+    ));
+  };
+
+  render() {
     return (
       <View>
         <DataTable>
@@ -67,15 +91,7 @@ export default class MobileNet extends Component {
             <DataTable.Title>Class</DataTable.Title>
             <DataTable.Title numeric>Probability</DataTable.Title>
           </DataTable.Header>
-          {isEmpty && <EmptyRow />}
-          {predictions.map(({ className, probability }) => (
-            <DataTable.Row key={className}>
-              <DataTable.Cell>{className}</DataTable.Cell>
-              <DataTable.Cell numeric>
-                {formatPercentage(probability)}
-              </DataTable.Cell>
-            </DataTable.Row>
-          ))}
+          {this.renderTableRows()}
         </DataTable>
       </View>
     );

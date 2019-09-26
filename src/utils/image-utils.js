@@ -1,6 +1,15 @@
+import * as ImageManipulator from "expo-image-manipulator";
 import * as tf from "@tensorflow/tfjs";
 import { decode as jpegDecode } from "jpeg-js";
 import { decode as pngDecode } from "upng-js";
+
+export function resizeImage(uri) {
+  return ImageManipulator.manipulateAsync(
+    uri,
+    [{ resize: { width: 400, height: 300 } }],
+    { base64: true }
+  );
+}
 
 export function removeAlphaChannel(width, height, data) {
   const buffer = new Uint8Array(width * height * 3);

@@ -26,32 +26,32 @@ export default class MainScreen extends Component {
     if (Constants.platform.ios) {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
       if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
+        alert("Camera roll permission is required for selecting images.");
       }
     }
   };
 
   pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ base64: true });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    });
     if (!result.cancelled) {
-      this.setState({
-        imageURI: result.uri,
-        imageBase64: result.base64,
-      });
+      this.setState({ imageURI: result.uri });
     }
   };
 
   render() {
-    const { imageURI, imageBase64 } = this.state;
+    const { imageURI } = this.state;
+    const source = imageURI ? { uri: imageURI } : sampleImage;
     return (
       <Card>
         <Card.Title
           title="Predictions"
           left={props => <Avatar.Icon {...props} icon="computer" />}
         />
-        <Card.Cover source={imageURI ? { uri: imageURI } : sampleImage} />
+        <Card.Cover source={source} />
         <Card.Content>
-          <MobileNet source={imageBase64 || sampleImage} />
+          <MobileNet source={source} />
         </Card.Content>
         <Card.Actions style={styles.cardActions}>
           <Button icon="camera" mode="outlined" onPress={this.pickImage}>
